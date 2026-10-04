@@ -1,0 +1,27 @@
+{
+  "schemaVersion": 1,
+  "id": "sacraft",
+  "version": "${version}",
+  "name": "SACraft",
+  "description": "Play SA with Minecraft physics, inventory and viewmodels.",
+  "authors": ["chasmlol"],
+  "contact": {
+    "sources": "https://github.com/chasmlol/SACraft"
+  },
+  "license": "MIT",
+  "environment": "client",
+  "entrypoints": {
+    "main": ["dev.sacraft.SACraft"],
+    "client": ["dev.sacraft.client.SACraftClient"]
+  },
+  "mixins": [
+    "sacraft.mixins.json",
+    { "config": "sacraft.client.mixins.json", "environment": "client" }
+  ],
+  "depends": {
+    "fabricloader": ">=0.19.5",
+    "minecraft": "~26.3",
+    "java": ">=25",
+    "fabric-api": "*"
+  }
+}

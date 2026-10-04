@@ -1,0 +1,18 @@
+# Python
+__pycache__/
+*.pyc
+
+# Gradle / Java Build
+build/
+.gradle/
+target/
+
+# IDE / Editor
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS Files
+.DS_Store
+Thumbs.db

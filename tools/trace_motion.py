@@ -1,4 +1,4 @@
-"""Records how the player's motion reaches Skyrim, to diagnose camera and body jitter.
+"""Records how the player's motion reaches SA, to diagnose camera and body jitter.
 
 Read-only: it samples the link's McState (written by Minecraft every frame and every physics tick)
 as fast as it can and writes two CSV files:
@@ -54,7 +54,7 @@ def main():
     seconds = float(sys.argv[1]) if len(sys.argv) > 1 else 20.0
     out = sys.argv[2] if len(sys.argv) > 2 else "."
     os.makedirs(out, exist_ok=True)
-    name = os.environ.get("SKYCRAFT_LINK", "Local\\SkyCraft_v1")
+    name = os.environ.get("SACRAFT_LINK", "Local\\SACraft_v1")
     m = mmap.mmap(-1, 0x1000, tagname=name)
     freq = qpc_freq()
     t0 = qpc()

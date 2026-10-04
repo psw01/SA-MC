@@ -1,11 +1,11 @@
-# Builds both halves of SkyCraft and packs a release into dist\:
-#   SkyCraft-<version>.zip             the Skyrim mod (install with MO2 or Vortex): the SKSE plugin, its
-#                                      ini, and SkyCraft-Minecraft.zip, the Minecraft it starts
-#   SkyCraft-<version>-pdb.zip         the plugin's debug symbols, for reading crash logs
-#   skycraft-fabric-<version>.jar      the Minecraft mod on its own (for your own launcher)
+# Builds both halves of SACraft and packs a release into dist\:
+#   SACraft-<version>.zip             the SA mod (install with MO2 or Vortex): the SA-host plugin, its
+#                                      ini, and SACraft-Minecraft.zip, the Minecraft it starts
+#   SACraft-<version>-pdb.zip         the plugin's debug symbols, for reading crash logs
+#   sacraft-fabric-<version>.jar      the Minecraft mod on its own (for your own launcher)
 #
-# SkyCraft-Minecraft.zip holds a portable Prism Launcher with a ready "SkyCraft" instance (Minecraft
-# 26.3, Fabric, Fabric API, SkyCraft). The plugin unpacks it to %LOCALAPPDATA%\SkyCraft and starts it;
+# SACraft-Minecraft.zip holds a portable Prism Launcher with a ready "SACraft" instance (Minecraft
+# 26.3, Fabric, Fabric API, SACraft). The plugin unpacks it to %LOCALAPPDATA%\SACraft and starts it;
 # Prism asks the player to sign in once, then downloads Minecraft and Java itself.
 #
 #   powershell -ExecutionPolicy Bypass -File tools\package.ps1 [-NoBuild]
@@ -64,7 +64,7 @@ if (-not $NoBuild) {
     try {
         cmake --preset default | Out-Null
         cmake --build --preset release
-        if ($LASTEXITCODE) { throw "the SKSE plugin didn't build" }
+        if ($LASTEXITCODE) { throw "the SA-host plugin didn't build" }
     } finally { Pop-Location }
     Push-Location "$root\fabric"
     try {
@@ -73,9 +73,9 @@ if (-not $NoBuild) {
     } finally { Pop-Location }
 }
 
-$dll = "$root\skse\build\RelWithDebInfo\SkyCraft.dll"
-$pdb = "$root\skse\build\RelWithDebInfo\SkyCraft.pdb"
-$jar = "$root\fabric\build\libs\skycraft-$version.jar"
+$dll = "$root\skse\build\RelWithDebInfo\SACraft.dll"
+$pdb = "$root\skse\build\RelWithDebInfo\SACraft.pdb"
+$jar = "$root\fabric\build\libs\sacraft-$version.jar"
 foreach ($f in @($dll, $pdb, $jar)) {
     if (-not (Test-Path $f)) { throw "missing $f (build first, or drop -NoBuild)" }
 }
@@ -89,30 +89,30 @@ $dist = "$root\dist"
 New-Item -ItemType Directory $dist -Force | Out-Null
 Get-ChildItem $dist | Remove-Item -Recurse -Force
 
-# The bundled Minecraft: Prism (portable), the SkyCraft instance, its mods, Prism's default settings.
+# The bundled Minecraft: Prism (portable), the SACraft instance, its mods, Prism's default settings.
 $bundle = "$dist\bundle"
 Copy-Item -Recurse "$root\tools\minecraft-bundle" $bundle
 Expand-Archive "$cache\$prismZip" "$bundle\Prism" -Force
 Copy-Item "$cache\PrismLauncher-$prismVersion-LICENSE.txt" "$bundle\Prism\LICENSE-PrismLauncher.txt"
 (Get-Content "$bundle\Prism\THIRD-PARTY.txt" -Raw).Replace("{PRISM_VERSION}", $prismVersion) | Set-Content "$bundle\Prism\THIRD-PARTY.txt" -NoNewline
-$mods = "$bundle\Prism\instances\SkyCraft\.minecraft\mods"
+$mods = "$bundle\Prism\instances\SACraft\.minecraft\mods"
 New-Item -ItemType Directory $mods -Force | Out-Null
 Copy-Item "$cache\$fabricApiJar" $mods
 Copy-Item "$cache\$e4mcJar" $mods
-Copy-Item $jar "$mods\skycraft-$version.jar"
-Set-Content "$bundle\bundle-version.txt" "SkyCraft $version, Prism Launcher $prismVersion, $fabricApiJar, $e4mcJar" -NoNewline
-New-ZipFromFolder "$dist\SkyCraft-Minecraft.zip" $bundle
+Copy-Item $jar "$mods\sacraft-$version.jar"
+Set-Content "$bundle\bundle-version.txt" "SACraft $version, Prism Launcher $prismVersion, $fabricApiJar, $e4mcJar" -NoNewline
+New-ZipFromFolder "$dist\SACraft-Minecraft.zip" $bundle
 Remove-Item -Recurse -Force $bundle
 
-New-Zip "$dist\SkyCraft-$version.zip" ([ordered]@{
-    "SKSE/Plugins/SkyCraft.dll" = $dll
-    "SKSE/Plugins/SkyCraft.ini" = "$root\skse\SkyCraft.ini"
-    "SKSE/Plugins/SkyCraft/SkyCraft-Minecraft.zip" = "$dist\SkyCraft-Minecraft.zip"
-    "SKSE/Plugins/SkyCraft/LICENSE.txt" = "$root\LICENSE"
-    "SKSE/Plugins/SkyCraft/THIRD-PARTY-NOTICES.md" = "$root\THIRD-PARTY-NOTICES.md"
+New-Zip "$dist\SACraft-$version.zip" ([ordered]@{
+    "SA-host/Plugins/SACraft.dll" = $dll
+    "SA-host/Plugins/SACraft.ini" = "$root\skse\SACraft.ini"
+    "SA-host/Plugins/SACraft/SACraft-Minecraft.zip" = "$dist\SACraft-Minecraft.zip"
+    "SA-host/Plugins/SACraft/LICENSE.txt" = "$root\LICENSE"
+    "SA-host/Plugins/SACraft/THIRD-PARTY-NOTICES.md" = "$root\THIRD-PARTY-NOTICES.md"
 })
-New-Zip "$dist\SkyCraft-$version-pdb.zip" ([ordered]@{ "SkyCraft.pdb" = $pdb })
-Copy-Item $jar "$dist\skycraft-fabric-$version.jar"
-Remove-Item "$dist\SkyCraft-Minecraft.zip"
+New-Zip "$dist\SACraft-$version-pdb.zip" ([ordered]@{ "SACraft.pdb" = $pdb })
+Copy-Item $jar "$dist\sacraft-fabric-$version.jar"
+Remove-Item "$dist\SACraft-Minecraft.zip"
 
 Get-ChildItem $dist | ForEach-Object { "{0,-40} {1,12:N0} bytes" -f $_.Name, $_.Length }

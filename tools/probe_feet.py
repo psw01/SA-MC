@@ -1,6 +1,6 @@
 """Read live SkyState/McState and show the collision voxels under the player (read-only)."""
 import mmap, struct
-NAME = r"Local\SkyCraft_v1"
+NAME = os.environ.get("SACRAFT_LINK", r"Local\SACraft_v1")
 OFF_COL = 0x20000
 COL_BYTES = 32 << 20
 DATA = COL_BYTES - 0x80

@@ -24,12 +24,12 @@ loom {
 	runs {
 		client {
 			programArgs "--username", (System.getenv("SKYCRAFT_USERNAME") ?: "Dovahkiin")
-			vmArgs "--enable-native-access=ALL-UNNAMED", "-Dskycraft.quitWithSkyrim=false"
+			vmArgs "--enable-native-access=ALL-UNNAMED", "-Dskycraft.quitWithSA=false"
 		}
 	}
 
 	mods {
-		"skycraft" {
+		"sacraft" {
 			sourceSet sourceSets.main
 			sourceSet sourceSets.client
 		}

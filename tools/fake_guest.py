@@ -1,8 +1,8 @@
-"""A stand-in Skyrim for a second, local Minecraft client, to try SkyCraft multiplayer on one PC.
+"""A stand-in SA for a second, local Minecraft client, to try SACraft multiplayer on one PC.
 
-The guest client (started by tools/run_guest.ps1: -Dskycraft.link=Local\\SkyCraft_guest, --username
-Guest) joins the host's world; this script is its "Skyrim". It
-  * copies the ground the host's real Skyrim describes (the host's collision messages, read without
+The guest client (started by tools/run_guest.ps1: -Dsacraft.link=Local\\SACraft_guest, --username
+Guest) joins the host's world; this script is its "SA". It
+  * copies the ground the host's real SA describes (the host's collision messages, read without
     consuming them) to the guest, so the guest stands on the real terrain near the host;
   * starts the guest a few blocks from the host and then follows the host: it turns the guest
     towards the host and walks (sprints when far) whenever the host is more than a few blocks away;
@@ -10,7 +10,7 @@ Guest) joins the host's world; this script is its "Skyrim". It
 
     python tools/fake_guest.py [seconds] [slot_angle_degrees] [slot_radius]
 
-Several guests: give each its own link (SKYCRAFT_LINK=Local\\SkyCraft_guest2, ...; the client gets
+Several guests: give each its own link (SACRAFT_LINK=Local\\SACraft_guest2, ...; the client gets
 the same via run_guest.ps1 -Link) and its own slot angle, so they spread around the host.
 """
 import math
@@ -20,19 +20,19 @@ import struct
 import sys
 import time
 
-os.environ.setdefault("SKYCRAFT_LINK", "Local\\SkyCraft_guest")
-import fake_skyrim as fs  # noqa: E402  (reads SKYCRAFT_LINK for its mapping name)
+os.environ.setdefault("SACRAFT_LINK", "Local\\SACraft_guest")
+import fake_sa as fs  # noqa: E402  (reads SACRAFT_LINK for its mapping name)
 
 KEY_W, KEY_A, KEY_S, KEY_D, KEY_SPACE, KEY_LCTRL = 26, 4, 22, 7, 44, 224  # SDL scancodes
 FOLLOW_FROM, STOP_AT, SPRINT_FROM = 1.5, 0.6, 8.0  # blocks from its spot beside the host
 
 
 class HostLink:
-    """Read-only view of the host's link: its player, and its Skyrim's collision messages."""
+    """Read-only view of the host's link: its player, and its SA's collision messages."""
 
     def __init__(self):
-        self.m = mmap.mmap(-1, fs.OFF_COL + fs.COL_BYTES, tagname="Local\\SkyCraft_v1")
-        self.read_at = self.col_head()  # only what the host's Skyrim sends from now on
+        self.m = mmap.mmap(-1, fs.OFF_COL + fs.COL_BYTES, tagname=os.environ.get("SACRAFT_LINK", "Local\\SACraft_v1"))
+        self.read_at = self.col_head()  # only what the host's SA sends from now on
 
     def player(self):
         _, flags, x, y, z = struct.unpack_from("<IIddd", self.m, fs.OFF_MC)
@@ -46,7 +46,7 @@ class HostLink:
         return struct.unpack_from("<Q", self.m, fs.OFF_COL)[0]
 
     def new_collision(self):
-        """Collision messages the host's Skyrim wrote since the last call: [(type, payload)]."""
+        """Collision messages the host's SA wrote since the last call: [(type, payload)]."""
         out = []
         head = self.col_head()
         if head - self.read_at > fs.COL_DATA or head < self.read_at:

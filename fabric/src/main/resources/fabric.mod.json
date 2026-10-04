@@ -1,22 +1,22 @@
 {
   "schemaVersion": 1,
-  "id": "skycraft",
+  "id": "sacraft",
   "version": "${version}",
-  "name": "SkyCraft",
-  "description": "Play Skyrim with Minecraft physics, inventory and viewmodels.",
+  "name": "SACraft",
+  "description": "Play SA with Minecraft physics, inventory and viewmodels.",
   "authors": ["chasmlol"],
   "contact": {
-    "sources": "https://github.com/chasmlol/SkyCraft"
+    "sources": "https://github.com/chasmlol/SACraft"
   },
   "license": "MIT",
   "environment": "client",
   "entrypoints": {
-    "main": ["dev.skycraft.SkyCraft"],
-    "client": ["dev.skycraft.client.SkyCraftClient"]
+    "main": ["dev.sacraft.SACraft"],
+    "client": ["dev.sacraft.client.SACraftClient"]
   },
   "mixins": [
-    "skycraft.mixins.json",
-    { "config": "skycraft.client.mixins.json", "environment": "client" }
+    "sacraft.mixins.json",
+    { "config": "sacraft.client.mixins.json", "environment": "client" }
   ],
   "depends": {
     "fabricloader": ">=0.19.5",

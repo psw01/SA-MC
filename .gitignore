@@ -1,20 +1,18 @@
-# gradle / loom
-fabric/.gradle/
-fabric/build/
-fabric/run/
-fabric/out/
-# cmake / vcpkg
-skse/build/
-skse/vcpkg_installed/
-# ide
-.vs/
-.idea/
-*.iml
-.tools/
-# release packaging
-dist/
-# local tools and settings
-CMakeUserPresets.json
-fabric/run-guest*/
+# Python
 __pycache__/
 *.pyc
+
+# Gradle / Java Build
+build/
+.gradle/
+target/
+
+# IDE / Editor
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS Files
+.DS_Store
+Thumbs.db

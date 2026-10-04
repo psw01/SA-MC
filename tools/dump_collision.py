@@ -1,6 +1,6 @@
-"""Decode the collision ring in the live SkyCraft shared memory (read-only) and summarize it."""
+"""Decode the collision ring in the live SACraft shared memory (read-only) and summarize it."""
 import mmap, struct, sys
-NAME = "Local\SkyCraft_v1"
+NAME = os.environ.get("SACRAFT_LINK", r"Local\SACraft_v1")
 OFF_COL = 0x20000
 COL_BYTES = 32 << 20
 DATA = COL_BYTES - 0x80

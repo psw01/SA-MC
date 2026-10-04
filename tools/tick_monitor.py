@@ -4,7 +4,7 @@ k32 = ctypes.windll.kernel32
 freq = ctypes.c_int64(); k32.QueryPerformanceFrequency(ctypes.byref(freq)); F = freq.value
 def qpc():
     v = ctypes.c_int64(); k32.QueryPerformanceCounter(ctypes.byref(v)); return v.value
-m = mmap.mmap(-1, 0x1000, tagname=r"Local\SkyCraft_v1", access=mmap.ACCESS_READ)
+m = mmap.mmap(-1, 0x1000, tagname=r"Local\SACraft_v1", access=mmap.ACCESS_READ)
 secs = float(sys.argv[1]) if len(sys.argv) > 1 else 60
 last_tick = None; last_tick_seen = None; ticks = []; stalls = []
 last_frame = None; last_frame_t = qpc(); frame_stalls = []

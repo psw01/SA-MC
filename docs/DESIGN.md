@@ -1,4 +1,4 @@
-# SkyCraft — Design Doc
+# SACraft — Design Doc
 
 > Play Skyrim as the main game while *being* a Minecraft player: real Minecraft movement physics, inventory, items, block placing, and combat, inside the real Skyrim world, able to fight and talk to Skyrim NPCs.
 
@@ -33,19 +33,19 @@ Development happens against a **clean Fabric 26.3 dev environment** (Loom `runCl
 
 ```
 ┌──────────────────── Skyrim.exe ────────────────────┐        ┌──────────────── javaw.exe (Minecraft 26.3) ────────────────┐
-│  skycraft.dll  (SKSE plugin, CommonLibSSE-NG)       │        │  skycraft (Fabric mod)                                     │
+│  sacraft.dll  (SKSE plugin, CommonLibSSE-NG)       │        │  sacraft (Fabric mod)                                     │
 │                                                     │        │                                                            │
 │  WorldExporter   ─ Skyrim collision near player ────┼──────▶ │  CollisionField  → injected into MC collision queries      │
 │  ActorMirror     ─ nearby NPCs (pos, box, state) ───┼──────▶ │  ActorProxy entities (invisible, hittable)                │
 │  InputBridge     ─ raw keyboard/mouse ──────────────┼──────▶ │  input handlers (as if MC window had focus)                │
-│  HitBridge       ─ "NPC hit player for X" ──────────┼──────▶ │  player.hurt(skycraft:skyrim_* damage source)              │
+│  HitBridge       ─ "NPC hit player for X" ──────────┼──────▶ │  player.hurt(sacraft:skyrim_* damage source)              │
 │                                                     │        │                                                            │
 │  PlayerPuppet    ◀─ player pos / look / pose ───────┼─────── │  real MC LocalPlayer physics                               │
 │  CameraDriver    ◀─ view + projection matrix ───────┼─────── │  GameRenderer camera                                       │
 │  DamageApplier   ◀─ "you hit NPC 0x1A2B3 for X" ────┼─────── │  ActorProxy.hurt() hook                                    │
 │  Compositor      ◀─ color+depth textures (GPU) ─────┼─────── │  offscreen render: world layer / hand layer / GUI layer    │
 └─────────────────────────────────────────────────────┘        └────────────────────────────────────────────────────────────┘
-                         shared memory (Local\SkyCraft_v1) + named events + shared GPU textures
+                         shared memory (Local\SACraft_v1) + named events + shared GPU textures
 ```
 
 Plus one small shared piece: **`protocol/`**, the message schema used by both sides (§10).
@@ -64,7 +64,7 @@ mc.pitch = f(sky.rotX)
 
 - **Vertical range:** Skyrim terrain spans more than 384 blocks (the Throat of the World is well above MC's default build height). The mirror world therefore uses a **custom `dimension_type`** with an expanded range (up to min_y −2032 / height 4064).
 - **Worldspaces:** each Skyrim worldspace (Tamriel, Solstheim, etc.) maps to its own MC dimension.
-- **Interiors:** interior cells live in one `skycraft:interiors` dimension. Each interior cell gets its own 1024×1024 region slot, allocated by FormID.
+- **Interiors:** interior cells live in one `sacraft:interiors` dimension. Each interior cell gets its own 1024×1024 region slot, allocated by FormID.
 - Changing cell or worldspace in Skyrim (load doors) moves the MC player to the matching dimension or slot.
 
 ## 5. The mirror world (Minecraft side)
@@ -130,7 +130,7 @@ Later: a Mixin on fluid-state queries reports `water` inside Skyrim water volume
 
 ### 8.1 Skyrim NPCs inside Minecraft: ActorProxy
 
-For every Skyrim actor within ~64 blocks, the MC server spawns a `skycraft:actor_proxy` entity:
+For every Skyrim actor within ~64 blocks, the MC server spawns a `sacraft:actor_proxy` entity:
 
 - **Invisible**, because Skyrim draws the real NPC.
 - Its **hitbox** comes from the actor's bound or race dimensions and updates each tick; position and rotation are interpolated.
@@ -150,7 +150,7 @@ For every Skyrim actor within ~64 blocks, the MC server spawns a `skycraft:actor
 
 1. Skyrim's hit on the player puppet (melee, arrow, spell) is caught in a hook and **cancelled on the Skyrim side**.
 2. The plugin sends `PlayerHurt {amount, type, sourceFormId, direction}`.
-3. MC applies `player.hurt()` with custom damage types (`skycraft:skyrim_melee`, `skyrim_arrow`, `skyrim_magic`). Armor, Protection, shields and blocking, totems, i-frames and knockback are all vanilla MC.
+3. MC applies `player.hurt()` with custom damage types (`sacraft:skyrim_melee`, `skyrim_arrow`, `skyrim_magic`). Armor, Protection, shields and blocking, totems, i-frames and knockback are all vanilla MC.
 4. **MC health is authoritative.** Skyrim's player health is mirrored as a fraction so NPC behaviour (fleeing, finishers) still reads sensibly.
    - MC death means the Skyrim player is killed, and Skyrim's normal death/reload flow runs.
    - Fall damage is MC's own.
@@ -179,7 +179,7 @@ Skyrim renders the world. MC renders **only its own stuff** offscreen at Skyrim'
 
 ## 10. Protocol / IPC
 
-- **Shared memory** `Local\SkyCraft_v1` holds:
+- **Shared memory** `Local\SACraft_v1` holds:
   - a **header**: magic, protocol version, both PIDs, heartbeats
   - **latest-value slots** under a seqlock, for per-frame data: `PlayerState`, `CameraState`, `FrameSync`
   - **two SPSC ring buffers** (Skyrim→MC and MC→Skyrim) for events
@@ -211,7 +211,7 @@ Initial message catalog:
   - Final: one merged Havok shape per chunk.
 - **Save/load:** SKSE serialization stores a `saveId` in each Skyrim save. On save, MC flushes the mirror world and snapshots its (tiny, sparse) region and player data under that id. On load, it restores that snapshot, so loading an old Skyrim save also rewinds your builds and inventory consistently.
 - **Launching:** the MC client must go through a real launcher for account auth.
-  - v1: start the SkyCraft MC profile first. It waits in standby and Skyrim connects on game load.
+  - v1: start the SACraft MC profile first. It waits in standby and Skyrim connects on game load.
   - Later: Skyrim triggers the launcher automatically.
   - During development, Loom `runClient` is enough.
 
@@ -251,7 +251,7 @@ Each phase ends in something you can actually play.
 ## 15. Repo layout (proposed)
 
 ```
-skycraft/
+sacraft/
   docs/DESIGN.md
   protocol/            message schema + generator + layout tests
   skse/                SKSE plugin (CMake, vcpkg, CommonLibSSE-NG, C++23)

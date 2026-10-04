@@ -1,9 +1,9 @@
 import os
-# Address Library (format 5, Skyrim 1.7.99+) lookup: python tools/addrlib.py <id> [...] prints each ID's address, or None
+# Address Library (format 5, SA 1.7.99+) lookup: python tools/addrlib.py <id> [...] prints each ID's address, or None
 # if this game build lacks it. Check every CommonLib RELOCATION_ID / REL::ID before relying on it.
 import struct, sys
-DB = os.environ.get("SKYCRAFT_ADDRLIB") or os.path.expandvars(
-    "%LOCALAPPDATA%/ModOrganizer/Skyrim Special Edition/mods/Address Library All in One/SKSE/Plugins/versionlib-1-7-104-0.bin")
+DB = os.environ.get("SACRAFT_ADDRLIB") or os.path.expandvars(
+    "%LOCALAPPDATA%/ModOrganizer/GTA San Andreas/mods/Address Library All in One/SA-host/Plugins/versionlib-1-7-104-0.bin")
 BASE = 0x140000000
 _d = open(DB, 'rb').read()
 assert struct.unpack_from('<i', _d, 0)[0] == 5
